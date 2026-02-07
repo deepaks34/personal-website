@@ -48,7 +48,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::616033922030:role/github-actions-eks-deployer
+          role-to-assume: arn:aws:iam::616033922030:oidc-provider/token.actions.githubusercontent.com
           aws-region: us-east-1
 
       # 7️⃣ Connect kubectl to your EKS cluster
