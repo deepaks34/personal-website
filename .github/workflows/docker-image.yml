@@ -57,6 +57,7 @@ jobs:
           aws eks update-kubeconfig \
             --region us-east-1 \
             --name simple-eks
+            --role-arn arn:aws:iam::616033922030:role/github-actions-eks-deployer
 
       - name: Apply Kubernetes manifests
         run: |
