@@ -51,18 +51,11 @@ jobs:
           role-to-assume: arn:aws:iam::616033922030:role/github-actions-eks-deployer
           aws-region: us-east-1
 
-      # 7️⃣ Connect kubectl to your EKS cluster
+      # 7️⃣ Connect kubectl to your EKS cluster 
+      
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig \
-            --region us-east-1 \
-            --name simple-eks
-            --role-arn arn:aws:iam::616033922030:role/github-actions-eks-deployer
-
-      - name: Apply Kubernetes manifests
-        run: |
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
+          aws eks update-kubeconfig --region us-east-1 --name simple-eks --role-arn arn:aws:iam::616033922030:role/github-actions-eks-deployer
 
       # 8️⃣ Deploy new image to EKS
       - name: Update Kubernetes deployment
