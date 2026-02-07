@@ -62,7 +62,8 @@ jobs:
       - name: Update Kubernetes deployment
         run: |
           kubectl set image deployment/personal-website \
-            personal-website=saxenad592/personal-website:${{ steps.vars.outputs.SHA }}
+            website=saxenad592/personal-website:${{ steps.vars.outputs.SHA }}
+
 
       # 9️⃣ Verify rollout
       - name: Wait for rollout to finish
