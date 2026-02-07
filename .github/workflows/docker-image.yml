@@ -60,8 +60,8 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f /personal-website/deployment.yaml
-          kubectl apply -f /personal-website/service.yaml
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
 
       # 8️⃣ Deploy new image to EKS
       - name: Update Kubernetes deployment
