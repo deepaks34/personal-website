@@ -55,7 +55,7 @@ jobs:
       
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name simple-eks --role-arn arn:aws:iam::616033922030:role/github-actions-eks-deployer
+          aws eks update-kubeconfig --region us-east-1 --name simple-eks 
 
       # 8️⃣ Deploy new image to EKS
       - name: Update Kubernetes deployment
