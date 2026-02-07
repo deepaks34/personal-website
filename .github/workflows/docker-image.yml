@@ -1,28 +1,36 @@
-name: Build and Push Docker Image
+name: Build, Push & Deploy to EKS (OIDC)
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  id-token: write    # REQUIRED for AWS OIDC
+  contents: read
+
 jobs:
-  docker:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout source code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Login to Docker Hub
       - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # 3️⃣ Get short git SHA for image tag
       - name: Extract Git commit SHA
         id: vars
         run: echo "SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      # 4️⃣ Build Docker image
       - name: Build Docker image
         run: |
           docker build \
@@ -30,8 +38,33 @@ jobs:
             -t saxenad592/personal-website:${{ steps.vars.outputs.SHA }} \
             .
 
+      # 5️⃣ Push Docker image
       - name: Push Docker image
         run: |
           docker push saxenad592/personal-website:latest
           docker push saxenad592/personal-website:${{ steps.vars.outputs.SHA }}
 
+      # 6️⃣ Assume AWS IAM role using OIDC (NO SECRETS)
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::616033922030:role/github-actions-eks-deployer
+          aws-region: us-east-1
+
+      # 7️⃣ Connect kubectl to your EKS cluster
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region us-east-1 \
+            --name simple-eks
+
+      # 8️⃣ Deploy new image to EKS
+      - name: Update Kubernetes deployment
+        run: |
+          kubectl set image deployment/personal-website \
+            personal-website=saxenad592/personal-website:${{ steps.vars.outputs.SHA }}
+
+      # 9️⃣ Verify rollout
+      - name: Wait for rollout to finish
+        run: |
+          kubectl rollout status deployment/personal-website
